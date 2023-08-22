@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.io Chat Rooms</title>
+</head>
+<body>
+    <div>
+        <button onclick="joinRoom('room1')">Join Room 1</button>
+        <button onclick="joinRoom('room2')">Join Room 2</button>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://localhost:3000');
+
+        function joinRoom(roomName) {
+            socket.emit('join', roomName);
+            console.log(`Joined ${roomName}`);
+            
+            // Sample: Send message to the room after joining
+            socket.emit('chat message', { room: roomName, msg: `Hello from ${roomName}!` });
+        }
+
+        socket.on('chat message', (msg) => {
+            console.log('Received:', msg);
+        });
+    </script>
+</body>
+</html>
