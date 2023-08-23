@@ -1,0 +1,53 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Group Chat</title>
+</head>
+<body>
+    <h1>Group Chat</h1>
+    
+    <input type="text" id="roomInput" placeholder="Enter room name">
+    <button onclick="joinRoom()">Join Room</button>
+
+    <ul id="messagesList"></ul>
+
+    <input type="text" id="messageInput" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io('http://localhost:3000');
+
+        function joinRoom() {
+            const roomName = document.getElementById('roomInput').value;
+            socket.emit('joinRoom1', { roomName: roomName });
+        }
+
+        socket.on('loadMessages1', (existingMessages) => {
+            existingMessages.forEach(displayMessage);
+        });
+
+        socket.on('newMessage', (message) => {
+            console.log(message);
+            displayMessage(message);
+        });
+
+        function sendMessage() {
+            const message = document.getElementById('messageInput').value;
+            const roomName = document.getElementById('roomInput').value;
+            socket.emit('sendMessageToRoom1', { roomName, message });
+            document.getElementById('messageInput').value = '';  // Clear input
+        }
+
+        function displayMessage(message) {
+            console.log(message);
+            const messageList = document.getElementById('messagesList');
+            const listItem = document.createElement('li');
+            listItem.textContent = `${message.userId}: ${message.message}`;
+            messageList.appendChild(listItem);
+        }
+    </script>
+</body>
+</html>

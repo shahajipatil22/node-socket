@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Typing Indicator</title>
+  </head>
+  <body>
+    <textarea id="message" oninput="typing()" onblur="stopTyping()"></textarea>
+    <div id="indicator"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      localStorage.debug = "socket.io-client:*";
+
+      let socket = io.connect("http://localhost:3000");
+      let indicatorEl = document.getElementById("indicator");
+
+      let username = prompt("Enter your room name:"); // For the sake of simplicity, just prompt for a name
+
+      socket.on("TYPE", (name) => {
+        indicatorEl.textContent = `${name} is typing...`;
+      });
+
+      socket.on("stop typing", (name) => {
+        indicatorEl.textContent = "";
+      });
+
+      function typing() {
+        socket.emit("typing", username);
+      }
+
+      function stopTyping() {
+        socket.emit("stop typing", username);
+      }
+
+      socket.on("message", (data) => {
+        console.log("Received:", data);
+      });
+
+      // Assuming you're using the browser
+
+      // Join a room
+      socket.emit("joinRoom", "myRoom");
+
+      // Leave a room
+      socket.emit("leaveRoom", "myRoom");
+
+      // Send a message to a room
+      socket.emit("sendMessageToRoom", {
+        roomName: "myRoom",
+        message: "Hello, room members!",
+      });
+
+      // Listen for new messages
+      socket.on("newMessage", (data) => {
+        console.log("Received:", data);
+      });
+
+      // Assuming you're using the browser
+      // const socket = io('http://localhost:3000');
+
+      // Function to join a room
+      function joinRoom(roomName) {
+        socket.emit("joinRoom", roomName);
+      }
+
+      // Function to send a message to a room
+      function sendMessage(roomName, message) {
+        socket.emit("sendMessageToRoom", { roomName, message });
+      }
+
+      // Listen for new messages
+      socket.on("newMessage", (data) => {
+        console.log("Received:", data);
+      });
+
+      // Example usage:
+      joinRoom("roomA");
+      sendMessage("roomA", "Hello members of roomA!");
+    </script>
+  </body>
+</html>
